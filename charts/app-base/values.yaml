@@ -179,3 +179,4 @@ scaledObject:
             periodSeconds: 120
         scaleUp:
           stabilizationWindowSeconds: 0
+# bump 1
