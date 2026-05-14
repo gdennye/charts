@@ -1,3 +1,7 @@
+# Default values for app-base.
+# This is a test comment for auto-versioning.
+# This chart is optimized for backend applications.
+
 ## @section Global parameters
 ## @param name [string] Name of the application. Used as a prefix for all resources. **Required.**
 ## @param namespace [string] Kubernetes namespace to deploy into. **Required.**
