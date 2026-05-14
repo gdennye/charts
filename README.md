@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 <p align="center">
-    <img width="200px" height="auto" src="https://raw.githubusercontent.com/helm/helm/main/docs/logos/helm-blue-vector.svg" alt="Helm Logo" />
+    <img width="280px" height="auto" src="https://raw.githubusercontent.com/cncf/artwork/master/projects/helm/horizontal/color/helm-horizontal-color.png" alt="Helm Logo" />
 </p>
 
 <p align="center">
@@ -22,9 +22,9 @@ helm install my-release gdennye/<chart>
 
 | Chart | Description |
 | ----- | ----------- |
-| [app-base](./app-base/) | Generic chart for backend applications: REST APIs, workers, and microservices. Supports Cloud SQL Auth Proxy sidecar, file-based secret mounts, and KEDA autoscaling. |
-| [app-front](./app-front/) | Generic chart for frontend SPAs where the web server is bundled inside the Docker image. Minimal footprint with full probe and autoscaling support. |
-| [app-front-nginx](./app-front-nginx/) | Generic chart for frontend SPAs where NGINX is configured by the chart via a generated ConfigMap. Supports HTTP-only and HTTPS/SSL modes. |
+| [app-base](./charts/app-base/) | Generic chart for backend applications: REST APIs, workers, and microservices. Supports Cloud SQL Auth Proxy sidecar, file-based secret mounts, and KEDA autoscaling. |
+| [app-front](./charts/app-front/) | Generic chart for frontend SPAs where the web server is bundled inside the Docker image. Minimal footprint with full probe and autoscaling support. |
+| [app-front-nginx](./charts/app-front-nginx/) | Generic chart for frontend SPAs where NGINX is configured by the chart via a generated ConfigMap. Supports HTTP-only and HTTPS/SSL modes. |
 
 ## Prerequisites
 

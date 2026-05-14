@@ -1,13 +1,8 @@
-﻿## chart-releaser configuration
+## chart-releaser configuration
 ## ref: https://github.com/helm/chart-releaser
 
-# The owner (GitHub username or org) of the repository.
-# Override via CR_OWNER environment variable or --owner CLI flag.
-# owner: gdennye
-
-# The name of the GitHub repository.
-# Override via CR_GIT_REPO environment variable or --git-repo CLI flag.
-# git-repo: charts
+# Directory containing all chart subdirectories.
+charts-dir: charts
 
 # The branch used to publish the Helm repository index.
 pages-branch: gh-pages
