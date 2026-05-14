@@ -1,0 +1,59 @@
+Thank you for installing {{ .Chart.Name }} v{{ .Chart.Version }}!
+
+==========================================================================
+  🚀 {{ .Values.name }} deployed successfully to namespace: {{ .Values.namespace }}
+==========================================================================
+
+Application Image:
+  {{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}
+
+Autoscaling:
+{{- if .Values.scaledObject.enabled }}
+  KEDA ScaledObject is ENABLED
+  Min replicas : {{ .Values.scaledObject.minReplicaCount }}
+  Max replicas : {{ .Values.scaledObject.maxReplicaCount }}
+  CPU trigger  : {{ .Values.scaledObject.triggers.cpu.value }}%
+  Memory trigger: {{ .Values.scaledObject.triggers.memory.value }}%
+{{- else }}
+  KEDA ScaledObject is disabled. Static replicas: {{ .Values.deployment.replicas }}
+{{- end }}
+
+Ingress:
+{{- if .Values.ingress.external.enabled }}
+  External: ENABLED
+  {{- $extHosts := .Values.ingress.external.hosts | default (list .Values.ingress.external.host) }}
+  {{- range $extHosts }}
+  → https://{{ . }}
+  {{- end }}
+{{- else }}
+  External Ingress: disabled
+{{- end }}
+{{- if .Values.ingress.internal.enabled }}
+  Internal: ENABLED
+  {{- $intHosts := .Values.ingress.internal.hosts | default (list .Values.ingress.internal.host) }}
+  {{- range $intHosts }}
+  → https://{{ . }}
+  {{- end }}
+{{- else }}
+  Internal Ingress: disabled
+{{- end }}
+
+Cloud SQL Proxy:
+{{- if .Values.deployment.cloudsqlProxy.enabled }}
+  ENABLED — Instance: {{ .Values.deployment.cloudsqlProxy.instances }}
+{{- else }}
+  disabled
+{{- end }}
+
+PodDisruptionBudget:
+{{- if .Values.pdb.enabled }}
+  ENABLED — minAvailable: {{ .Values.pdb.minAvailable }}
+{{- else }}
+  disabled
+{{- end }}
+
+To check deployment status:
+  kubectl rollout status deployment/{{ .Values.name }}-deployment -n {{ .Values.namespace }}
+
+To view logs:
+  kubectl logs -l app={{ .Values.name }} -n {{ .Values.namespace }} --tail=100 -f

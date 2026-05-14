@@ -1,0 +1,24 @@
+apiVersion: v2
+name: app-base
+description: |
+  A generic Helm chart for deploying backend applications (APIs, workers, microservices)
+  on Kubernetes. Supports KEDA autoscaling, GKE Gateway API HTTPRoutes, NGINX Ingress,
+  GCP HealthCheckPolicy, PodDisruptionBudget, and optional Cloud SQL Auth Proxy sidecar.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://github.com/your-org/charts
+sources:
+  - https://github.com/your-org/charts
+keywords:
+  - backend
+  - api
+  - microservice
+  - kubernetes
+  - keda
+  - autoscaling
+  - gke
+maintainers:
+  - name: your-org
+    url: https://github.com/your-org
+icon: https://raw.githubusercontent.com/your-org/charts/main/assets/app-base.png

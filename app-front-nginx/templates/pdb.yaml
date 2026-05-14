@@ -1,0 +1,12 @@
+﻿{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ required "A value for 'name' is required!" .Values.name }}-pdb
+  namespace: {{ required "A value for 'namespace' is required!" .Values.namespace }}
+spec:
+  minAvailable: {{ required "pdb.minAvailable is required when pdb.enabled is true!" .Values.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      app: {{ required "A value for 'name' is required!" .Values.name }}
+{{- end }}

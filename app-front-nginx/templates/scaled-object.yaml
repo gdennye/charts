@@ -1,0 +1,34 @@
+﻿{{- if .Values.scaledObject.enabled }}
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ required "A value for 'name' is required!" .Values.name }}-autoscaling
+  namespace: {{ required "A value for 'namespace' is required!" .Values.namespace }}
+spec:
+  scaleTargetRef:
+    name: {{ required "A value for 'name' is required!" .Values.name }}-deployment
+  minReplicaCount: {{ required "scaledObject.minReplicaCount is required!" .Values.scaledObject.minReplicaCount }}
+  maxReplicaCount: {{ required "scaledObject.maxReplicaCount is required!" .Values.scaledObject.maxReplicaCount }}
+  triggers:
+  - type: cpu
+    metricType: Utilization
+    metadata:
+      value: {{ .Values.scaledObject.triggers.cpu.value | quote }}
+  - type: memory
+    metricType: Utilization
+    metadata:
+      value: {{ .Values.scaledObject.triggers.memory.value | quote }}
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: {{ .Values.scaledObject.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.stabilizationWindowSeconds | default 600 }}
+          policies:
+          {{- range .Values.scaledObject.advanced.horizontalPodAutoscalerConfig.behavior.scaleDown.policies }}
+            - type: {{ .type }}
+              value: {{ .value }}
+              periodSeconds: {{ .periodSeconds }}
+          {{- end }}
+        scaleUp:
+          stabilizationWindowSeconds: {{ .Values.scaledObject.advanced.horizontalPodAutoscalerConfig.behavior.scaleUp.stabilizationWindowSeconds }}
+{{- end }}

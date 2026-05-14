@@ -1,0 +1,31 @@
+apiVersion: v2
+name: app-front-nginx
+description: |
+  A generic Helm chart for deploying frontend Single Page Applications (SPA) where NGINX
+  is managed by the chart itself via a ConfigMap. Supports HTTP-only mode (external Ingress)
+  and HTTPS/SSL termination at the pod level (internal mode with TLS secrets).
+  Supports KEDA autoscaling, GKE Gateway API HTTPRoutes, NGINX Ingress,
+  GCP HealthCheckPolicy, and PodDisruptionBudget.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://github.com/your-org/charts
+sources:
+  - https://github.com/your-org/charts
+keywords:
+  - frontend
+  - spa
+  - nginx
+  - react
+  - vue
+  - angular
+  - kubernetes
+  - keda
+  - autoscaling
+  - gke
+  - ssl
+  - tls
+maintainers:
+  - name: your-org
+    url: https://github.com/your-org
+icon: https://raw.githubusercontent.com/your-org/charts/main/assets/app-front-nginx.png

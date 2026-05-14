@@ -1,0 +1,15 @@
+﻿{{- if or .Values.ingress.external.enabled .Values.ingress.internal.enabled }}
+---
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: {{ required "A value for 'name' is required!'" .Values.name }}-backend-policy
+  namespace: {{ .Values.namespace }}
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: {{ required "A value for 'name' is required!'" .Values.name }}-service
+  default:
+    timeoutSec: {{ .Values.gcpBackendPolicy.timeoutSec | default 360 }}
+{{- end }}

@@ -1,0 +1,37 @@
+﻿
+{{- if .Values.ingress.internal.enabled }}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ required "A value for 'name' is required!" .Values.name }}-http-route-i
+  namespace: {{ .Values.namespace }}
+spec:
+  parentRefs:
+  {{- if empty .Values.ingress.internal.sectionNames }}
+  {{ required "ingress.internal.sectionNames is required when ingress.internal is enabled!" nil }}
+  {{- end }}
+  {{- range .Values.ingress.internal.sectionNames }}
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: gateway-internal
+    namespace: gateway-internal
+    sectionName: {{ . }}
+  {{- end }}
+  hostnames:
+  {{- $hosts := .Values.ingress.internal.hosts | default (list .Values.ingress.internal.host) }}
+  {{- range $hosts }}
+  - {{ . | quote }}
+  {{- end }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - group: ''
+      kind: Service
+      name: {{ required "A value for 'name' is required!" .Values.name }}-service
+      port: {{ .Values.service.ports.port | default 80 }}
+      weight: 1
+{{- end }}

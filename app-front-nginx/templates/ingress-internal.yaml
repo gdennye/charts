@@ -1,0 +1,43 @@
+﻿{{- if .Values.ingress.internal.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- if .Values.ingress.internal.annotations }}
+  annotations:
+    {{- toYaml .Values.ingress.internal.annotations | nindent 4 }}
+  {{- end }}
+  name: {{ required "A value for 'name' is required!" .Values.name }}-ingress-i
+  namespace: {{ .Values.namespace }}
+spec:
+  ingressClassName: {{ .Values.ingress.internal.ingressClassName | default "nginx" }}
+  rules:
+  {{- $hosts := .Values.ingress.internal.hosts | default (list .Values.ingress.internal.host) }}
+  {{- range $hosts }}
+  - host: {{ . }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ required "A value for 'name' is required!" $.Values.name }}-service
+            port:
+              name: {{ $.Values.service.portName | default "http" }}
+        path: /
+        pathType: Prefix
+  {{- end }}
+  tls:
+  {{- if .Values.ingress.internal.tls.configs }}
+  {{- range .Values.ingress.internal.tls.configs }}
+  - hosts:
+    {{- range .hosts }}
+    - {{ . }}
+    {{- end }}
+    secretName: {{ .secretName }}
+  {{- end }}
+  {{- else }}
+  - hosts:
+    {{- range $hosts }}
+    - {{ . }}
+    {{- end }}
+    secretName: {{ required "ingress.*.tls.secretCertificate is required when tls.configs is not set!" .Values.ingress.internal.tls.secretCertificate  }}
+  {{- end }}
+{{- end }}

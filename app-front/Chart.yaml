@@ -1,0 +1,27 @@
+apiVersion: v2
+name: app-front
+description: |
+  A generic Helm chart for deploying frontend Single Page Applications (SPA) on Kubernetes.
+  The application image is expected to bundle its own web server (e.g., NGINX or Node.js).
+  Supports KEDA autoscaling, GKE Gateway API HTTPRoutes, NGINX Ingress,
+  GCP HealthCheckPolicy, and PodDisruptionBudget.
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+home: https://github.com/your-org/charts
+sources:
+  - https://github.com/your-org/charts
+keywords:
+  - frontend
+  - spa
+  - react
+  - vue
+  - angular
+  - kubernetes
+  - keda
+  - autoscaling
+  - gke
+maintainers:
+  - name: your-org
+    url: https://github.com/your-org
+icon: https://raw.githubusercontent.com/your-org/charts/main/assets/app-front.png

@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ required "A value for 'name' is required!" .Values.name }}-deployment
+  namespace: {{ required "A value for 'namespace' is required!" .Values.namespace }}
+  annotations:
+    reloader.stakater.com/auto: "true"
+spec:
+  replicas: {{- if not .Values.scaledObject.enabled }}
+    {{ required "deployment.replicas is required when scaledObject.enabled is false." .Values.deployment.replicas }}
+  {{- else }}
+    {{ .Values.scaledObject.minReplicaCount }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit | default 1 }}
+  progressDeadlineSeconds: {{ .Values.deployment.progressDeadlineSeconds | default 3600 }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  strategy:
+    type: {{ .Values.deployment.strategy.type | default "RollingUpdate" }}
+    rollingUpdate:
+      maxSurge: {{ .Values.deployment.strategy.rollingUpdate.maxSurge | default 1 }}
+      maxUnavailable: {{ .Values.deployment.strategy.rollingUpdate.maxUnavailable | default 1 }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+      annotations:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+    spec:
+      containers:
+      - name: {{ .Values.name }}
+        image: {{ required "deployment.image.repository is required!" .Values.deployment.image.repository }}:{{ required "deployment.image.tag is required!" .Values.deployment.image.tag }}
+        imagePullPolicy: {{ .Values.deployment.image.pullPolicy | default "IfNotPresent" }}
+        {{- if or .Values.deployment.extraEnvFrom }}
+        envFrom:
+        {{- toYaml .Values.deployment.extraEnvFrom | nindent 8 }}
+        {{- end }}
+        {{- if .Values.deployment.extraEnv }}
+        env:
+        {{- toYaml .Values.deployment.extraEnv | nindent 8 }}
+        {{- end }}
+        ports:
+        - containerPort: {{ .Values.deployment.ports.http.containerPort | default 80 }}
+          name: http
+          protocol: TCP
+        {{- if .Values.deployment.resources }}
+        resources:
+          {{- toYaml .Values.deployment.resources | nindent 10 }}
+        {{- end }}
+        readinessProbe:
+          httpGet:
+            path: {{ .Values.deployment.probes.readiness.path | default "/healthcheck" }}
+            port: {{ .Values.deployment.probes.readiness.port | default 80 }}
+          failureThreshold: {{ .Values.deployment.probes.readiness.failureThreshold | default 4 }}
+          periodSeconds: {{ .Values.deployment.probes.readiness.periodSeconds | default 15 }}
+          successThreshold: {{ .Values.deployment.probes.readiness.successThreshold | default 1 }}
+          timeoutSeconds: {{ .Values.deployment.probes.readiness.timeoutSeconds | default 10 }}
+        startupProbe:
+          httpGet:
+            path: {{ .Values.deployment.probes.startup.path | default "/healthcheck" }}
+            port: {{ .Values.deployment.probes.startup.port | default 80 }}
+          successThreshold: {{ .Values.deployment.probes.startup.successThreshold | default 1 }}
+          failureThreshold: {{ .Values.deployment.probes.startup.failureThreshold | default 8 }}
+          periodSeconds: {{ .Values.deployment.probes.startup.periodSeconds | default 10 }}
+        livenessProbe:
+          httpGet:
+            path: {{ .Values.deployment.probes.liveness.path | default "/healthcheck" }}
+            port: {{ .Values.deployment.probes.liveness.port | default 80 }}
+          successThreshold: {{ .Values.deployment.probes.liveness.successThreshold | default 1 }}
+          failureThreshold: {{ .Values.deployment.probes.liveness.failureThreshold | default 4 }}
+          periodSeconds: {{ .Values.deployment.probes.liveness.periodSeconds | default 15 }}
+          timeoutSeconds: {{ .Values.deployment.probes.liveness.timeoutSeconds | default 10 }}
+        {{- if .Values.deployment.extraVolumeMounts }}
+        volumeMounts:
+        {{- toYaml .Values.deployment.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.deployment.extraVolumes }}
+      volumes:
+      {{- toYaml .Values.deployment.extraVolumes | nindent 6 }}
+      {{- end }}
+      {{- if .Values.deployment.nodeSelector.nodeTypePoolSpec }}
+      nodeSelector:
+        nodeTypePoolSpec: {{ .Values.deployment.nodeSelector.nodeTypePoolSpec }}
+      {{- end }}
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: {{ .Values.deployment.terminationGracePeriodSeconds }}
+      {{- with .Values.deployment.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

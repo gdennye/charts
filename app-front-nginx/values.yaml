@@ -1,0 +1,177 @@
+## @section Global parameters
+## @param name [string] Application name, used as prefix for all Kubernetes resources. **Required.**
+## @param namespace [string] Kubernetes namespace to deploy into. **Required.**
+## @param timezone [string] Timezone injected as TZ environment variable.
+name: ""
+namespace: ""
+timezone: "America/Sao_Paulo"
+
+## @section Deployment parameters
+deployment:
+  revisionHistoryLimit: 1
+  progressDeadlineSeconds: 3600
+
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  image:
+    ## @param deployment.image.repository Container image repository.
+    repository: ""
+    ## @param deployment.image.tag Container image tag.
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  resources: {}
+  # resources:
+  #   limits:
+  #     cpu: 500m
+  #     memory: 512Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 256Mi
+
+  ports:
+    http:
+      containerPort: 80
+
+  probes:
+    readiness:
+      path: /healthcheck
+      port: 80
+      failureThreshold: 4
+      periodSeconds: 15
+      successThreshold: 1
+      timeoutSeconds: 10
+    startup:
+      path: /healthcheck
+      port: 80
+      successThreshold: 1
+      failureThreshold: 8
+      periodSeconds: 10
+    liveness:
+      path: /healthcheck
+      port: 80
+      successThreshold: 1
+      failureThreshold: 4
+      periodSeconds: 15
+      timeoutSeconds: 10
+
+  ## @section NGINX configuration
+  ## Controls how the nginx ConfigMap is generated.
+  nginx:
+    ## @param deployment.nginx.workerProcesses NGINX worker_processes directive.
+    workerProcesses: "auto"
+    ## @param deployment.nginx.clientMaxBodySize Maximum allowed client request body size.
+    clientMaxBodySize: "100M"
+    ## @param deployment.nginx.gzip Enable gzip compression in NGINX.
+    gzip: false
+    ## @param deployment.nginx.extraConfig Extra NGINX directives to append inside the server block.
+    extraConfig: ""
+
+  ## @param deployment.extraEnv Extra environment variables for the main container.
+  extraEnv: []
+
+  ## @param deployment.extraVolumeMounts Extra volume mounts for the main container.
+  extraVolumeMounts: []
+
+  ## @param deployment.extraVolumes Extra volumes to add to the pod spec.
+  extraVolumes: []
+
+  nodeSelector:
+    ## @param deployment.nodeSelector.nodeTypePoolSpec Node pool label for scheduling. Leave empty to skip.
+    nodeTypePoolSpec: ""
+
+  ## @param deployment.tolerations Pod scheduling tolerations.
+  tolerations: []
+
+  terminationGracePeriodSeconds: 120
+
+  ## Volume mount paths for NGINX SSL certificates.
+  volumeMounts:
+    nginx:
+      mountPath: {}
+    ssl:
+      ## @param deployment.volumeMounts.ssl.mountPath Mount path for the primary SSL certificate secret.
+      mountPath: "/etc/nginx/ssl"
+    ssl-default:
+      ## @param deployment.volumeMounts.ssl-default.mountPath Mount path for the default SSL certificate secret.
+      mountPath: "/etc/nginx/ssl-default"
+
+## @section Service parameters
+service:
+  type: ClusterIP
+  ## @param service.annotations Annotations to add to the Service.
+  annotations: {}
+  ports:
+    port: 80
+    targetPort: 80
+
+## @section Ingress / Gateway parameters
+## When `ingress.external.enabled` is `true`, the NGINX ConfigMap uses HTTP-only mode (port 80,
+## CORS restricted to the external host). When `false`, NGINX runs in HTTPS mode (port 443, SSL
+## termination at the pod), with an HTTP→HTTPS redirect and two TLS certificate secrets:
+## `certificate-ssl` and `certificate-ssl-default`.
+ingress:
+  external:
+    ## @param ingress.external.enabled When `true`, NGINX uses HTTP mode; when `false`, HTTPS/SSL mode.
+    enabled: true
+    ## @param ingress.external.host Primary external hostname (used for CORS and NGINX `server_name`). **Required.**
+    host: ""
+    hosts: []
+    sectionNames: []
+    ingressClassName: "nginx"
+    tls:
+      secretCertificate: ""
+      configs: []
+
+  internal:
+    ## @param ingress.internal.enabled Enable internal Gateway API HTTPRoute.
+    enabled: false
+    host: ""
+    hosts: []
+    ## @param ingress.internal.sectionNames Gateway API section names. **Required when enabled.**
+    sectionNames: []
+    ingressClassName: "nginx"
+    tls:
+      secretCertificate: ""
+      configs: []
+
+## @section GCP parameters
+healthCheck:
+  requestPath: /healthcheck
+
+gcpBackendPolicy:
+  timeoutSec: 360
+  logging:
+    enabled: false
+    sampleRate: 500000
+
+## @section PodDisruptionBudget
+pdb:
+  enabled: false
+  minAvailable: ""
+
+## @section KEDA autoscaling
+scaledObject:
+  enabled: true
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+    cpu:
+      value: 80
+    memory:
+      value: 90
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 600
+          policies:
+          - type: Pods
+            value: 1
+            periodSeconds: 120
+        scaleUp:
+          stabilizationWindowSeconds: 0

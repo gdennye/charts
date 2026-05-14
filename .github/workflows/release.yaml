@@ -1,0 +1,93 @@
+name: Release Charts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      # Only run when chart files are changed
+      - "app-base/**"
+      - "app-front/**"
+      - "app-front-nginx/**"
+
+  # Allow manual trigger
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to create GitHub Releases and push to gh-pages
+  pages: write
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # ------------------------------------------------------------------ #
+      # 1. Checkout the full history so chart-releaser can detect changes
+      # ------------------------------------------------------------------ #
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------------ #
+      # 2. Configure Git identity (used when pushing to gh-pages)
+      # ------------------------------------------------------------------ #
+      - name: Configure Git
+        run: |
+          git config user.name  "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      # ------------------------------------------------------------------ #
+      # 3. Install Helm
+      # ------------------------------------------------------------------ #
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: "v3.14.4"
+
+      # ------------------------------------------------------------------ #
+      # 4. Lint all charts before packaging
+      # ------------------------------------------------------------------ #
+      - name: Lint Charts
+        run: |
+          helm lint ./app-base
+          helm lint ./app-front
+          helm lint ./app-front-nginx
+
+      # ------------------------------------------------------------------ #
+      # 5. Run chart-releaser
+      #    - Detects charts with a bumped 'version' in Chart.yaml
+      #    - Packages them into .tgz archives
+      #    - Creates a GitHub Release per chart version
+      #    - Updates the Helm repository index on the gh-pages branch
+      # ------------------------------------------------------------------ #
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
+        with:
+          # Directory containing all chart subdirectories (root of this repo)
+          charts_dir: .
+          # Skip packaging if a release with this version already exists
+          skip_existing: true
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+  # ------------------------------------------------------------------ #
+  # Notify on failure (optional — requires a SLACK_WEBHOOK_URL secret)
+  # ------------------------------------------------------------------ #
+  notify-on-failure:
+    needs: release
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify Slack on failure
+        if: ${{ secrets.SLACK_WEBHOOK_URL != '' }}
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "❌ Helm chart release failed on branch `${{ github.ref_name }}`.\nSee: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK

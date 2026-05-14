@@ -1,0 +1,281 @@
+## @section Global parameters
+## @param name [string] Name of the application. Used as a prefix for all resources. **Required.**
+## @param namespace [string] Kubernetes namespace to deploy into. **Required.**
+## @param timezone [string] Timezone for the pod environment variable TZ.
+name: ""
+namespace: ""
+timezone: "America/Sao_Paulo"
+
+## @section Deployment parameters
+deployment:
+  ## @param deployment.revisionHistoryLimit Number of old ReplicaSets to retain.
+  revisionHistoryLimit: 1
+  ## @param deployment.progressDeadlineSeconds Max seconds for deployment to make progress before considered failed.
+  progressDeadlineSeconds: 3600
+
+  ## @param deployment.strategy.type Deployment strategy type. `RollingUpdate` or `Recreate`.
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      ## @param deployment.strategy.rollingUpdate.maxSurge Max pods above the desired count during a rolling update.
+      maxSurge: 1
+      ## @param deployment.strategy.rollingUpdate.maxUnavailable Max pods unavailable during a rolling update.
+      maxUnavailable: 1
+
+  ## @param deployment.image.repository Container image repository.
+  ## @param deployment.image.tag Container image tag.
+  ## @param deployment.image.pullPolicy Image pull policy. `Always`, `IfNotPresent`, or `Never`.
+  image:
+    repository: ""
+    tag: ""
+    pullPolicy: IfNotPresent
+
+  ## @param deployment.resources Resource requests and limits for the main container.
+  ## ref: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources: {}
+  # resources:
+  #   limits:
+  #     cpu: 500m
+  #     memory: 512Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 256Mi
+
+  ## @param deployment.ports.http.containerPort HTTP port exposed by the container.
+  ports:
+    http:
+      containerPort: 80
+
+  ## @section Probe parameters
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  probes:
+    readiness:
+      ## @param deployment.probes.readiness.path HTTP path for the readiness probe.
+      path: /health/ready
+      ## @param deployment.probes.readiness.port Port for the readiness probe.
+      port: 80
+      failureThreshold: 4
+      periodSeconds: 15
+      successThreshold: 1
+      timeoutSeconds: 10
+    startup:
+      ## @param deployment.probes.startup.path HTTP path for the startup probe.
+      path: /health/live
+      port: 80
+      successThreshold: 1
+      failureThreshold: 8
+      periodSeconds: 10
+    liveness:
+      ## @param deployment.probes.liveness.path HTTP path for the liveness probe.
+      path: /health/live
+      port: 80
+      successThreshold: 1
+      failureThreshold: 4
+      periodSeconds: 15
+      timeoutSeconds: 10
+
+  ## @section Volume mount parameters
+  ## Configures file-based secrets mounted into the container.
+  volumeMounts:
+    ## @param deployment.volumeMounts.appsettings.enabled Enable the appsettings.json secret volume mount.
+    ## @param deployment.volumeMounts.appsettings.mountPath Path inside the container to mount the file.
+    ## @param deployment.volumeMounts.appsettings.subPath Subpath within the secret data.
+    ## @param deployment.volumeMounts.appsettings.secretName Name of the Kubernetes Secret to mount.
+    appsettings:
+      enabled: false
+      mountPath: /app/appsettings.json
+      subPath: appsettings.json
+      secretName: ""
+    ## @param deployment.volumeMounts.apiKey.enabled Enable the API key secret volume mount.
+    ## @param deployment.volumeMounts.apiKey.mountPath Path inside the container for the API key file.
+    ## @param deployment.volumeMounts.apiKey.subPath Subpath within the secret data.
+    ## @param deployment.volumeMounts.apiKey.secretName Name of the Kubernetes Secret to mount.
+    apiKey:
+      enabled: false
+      mountPath: /app/apis-key.json
+      subPath: apis-key.json
+      secretName: ""
+
+  ## @param deployment.extraVolumeMounts Extra volume mounts to add to the main container.
+  ## Example:
+  ## extraVolumeMounts:
+  ##   - name: my-config
+  ##     mountPath: /app/config.json
+  ##     subPath: config.json
+  ##     readOnly: true
+  extraVolumeMounts: []
+
+  ## @param deployment.extraVolumes Extra volumes to add to the pod.
+  ## Example:
+  ## extraVolumes:
+  ##   - name: my-config
+  ##     secret:
+  ##       secretName: my-config-secret
+  extraVolumes: []
+
+  ## @section Cloud SQL Auth Proxy sidecar
+  ## ref: https://cloud.google.com/sql/docs/mysql/connect-kubernetes-engine
+  cloudsqlProxy:
+    ## @param deployment.cloudsqlProxy.enabled Enable the Cloud SQL Auth Proxy sidecar container.
+    enabled: false
+    ## @param deployment.cloudsqlProxy.image.repository Cloud SQL Proxy image repository.
+    ## @param deployment.cloudsqlProxy.image.tag Cloud SQL Proxy image tag.
+    image:
+      repository: gcr.io/cloud-sql-connectors/cloud-sql-proxy
+      tag: "2.11.4"
+    ## @param deployment.cloudsqlProxy.instances Cloud SQL instance connection name (e.g., `project:region:instance=tcp:5432`).
+    instances: ""
+    ## @param deployment.cloudsqlProxy.credentialsSecretName Name of the Kubernetes Secret containing the GCP service account JSON key.
+    credentialsSecretName: ""
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+
+  ## @param deployment.extraEnv Extra environment variables to add to the main container.
+  ## Example:
+  ## extraEnv:
+  ##   - name: MY_VAR
+  ##     value: "my-value"
+  extraEnv: []
+
+  ## @param deployment.extraEnvFrom Extra envFrom sources (ConfigMaps, Secrets) for the main container.
+  ## The chart already injects `secretRef: name: config` by default. Use this for additional sources.
+  ## Example:
+  ## extraEnvFrom:
+  ##   - configMapRef:
+  ##       name: my-configmap
+  extraEnvFrom: []
+
+  ## @param deployment.nodeSelector.nodeTypePoolSpec Node pool label value for scheduling. Leave empty to skip node selection.
+  nodeSelector:
+    nodeTypePoolSpec: ""
+
+  ## @param deployment.tolerations Tolerations for pod scheduling.
+  ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  ## Example:
+  ## tolerations:
+  ##   - key: "nodepool"
+  ##     operator: "Equal"
+  ##     value: "standard"
+  ##     effect: "NoSchedule"
+  tolerations: []
+
+  ## @param deployment.terminationGracePeriodSeconds Duration the pod needs to terminate gracefully.
+  terminationGracePeriodSeconds: 120
+
+## @section Service parameters
+service:
+  ## @param service.type Kubernetes service type.
+  type: ClusterIP
+  ## @param service.annotations Annotations to add to the Service resource.
+  annotations: {}
+  ports:
+    ## @param service.ports.port Port exposed by the service.
+    port: 80
+    ## @param service.ports.targetPort Port on the pod to forward traffic to.
+    targetPort: 80
+
+## @section Ingress parameters
+ingress:
+  ## @param ingress.external.enabled Enable external Ingress (NGINX Ingress Controller).
+  ## @param ingress.external.host Primary hostname for the external Ingress.
+  ## @param ingress.external.hosts List of hostnames (overrides `host` when provided).
+  ## @param ingress.external.sectionNames Gateway API section names (used for HTTPRoute).
+  ## @param ingress.external.ingressClassName Ingress class name.
+  ## @param ingress.external.tls.secretCertificate Default TLS secret name (used when `tls.configs` is empty).
+  ## @param ingress.external.tls.configs Advanced TLS configuration list (each entry: `hosts[]`, `secretName`).
+  ## @param ingress.external.annotations Annotations to add to the external Ingress resource.
+  external:
+    enabled: false
+    host: ""
+    hosts: []
+    sectionNames: []
+    ingressClassName: "nginx"
+    tls:
+      secretCertificate: ""
+      configs: []
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "360"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "360"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
+      nginx.ingress.kubernetes.io/send-timeout: "180"
+
+  ## @param ingress.internal.enabled Enable internal Ingress / Gateway API HTTPRoute.
+  ## @param ingress.internal.host Primary hostname for the internal route.
+  ## @param ingress.internal.hosts List of hostnames (overrides `host` when provided).
+  ## @param ingress.internal.sectionNames Gateway API section names for the internal HTTPRoute.
+  ## @param ingress.internal.ingressClassName Ingress class name.
+  ## @param ingress.internal.tls.secretCertificate Default TLS secret name.
+  ## @param ingress.internal.tls.configs Advanced TLS configuration list.
+  ## @param ingress.internal.annotations Annotations to add to the internal Ingress resource.
+  internal:
+    enabled: false
+    host: ""
+    hosts: []
+    sectionNames: []
+    ingressClassName: "nginx"
+    tls:
+      secretCertificate: ""
+      configs: []
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+      nginx.ingress.kubernetes.io/proxy-buffer-size: "16k"
+      nginx.ingress.kubernetes.io/proxy-buffering: "off"
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: "360"
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "360"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "180"
+      nginx.ingress.kubernetes.io/send-timeout: "180"
+
+## @section GCP-specific parameters
+## @param healthCheck.requestPath HTTP path used by the GCP HealthCheckPolicy.
+healthCheck:
+  requestPath: /health/ready
+
+## @param gcpBackendPolicy.timeoutSec Timeout (in seconds) for the GCPBackendPolicy.
+## @param gcpBackendPolicy.logging.enabled Enable request logging on the GCP backend.
+## @param gcpBackendPolicy.logging.sampleRate Log sample rate (0–1000000).
+gcpBackendPolicy:
+  timeoutSec: 360
+  logging:
+    enabled: false
+    sampleRate: 500000
+
+## @section PodDisruptionBudget parameters
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/
+pdb:
+  ## @param pdb.enabled Enable PodDisruptionBudget.
+  enabled: false
+  ## @param pdb.minAvailable Minimum number of pods that must be available (integer or percentage string).
+  minAvailable: ""
+
+## @section KEDA autoscaling parameters
+## ref: https://keda.sh/docs/latest/concepts/scaling-deployments/
+scaledObject:
+  ## @param scaledObject.enabled Enable KEDA ScaledObject (disables the static `replicas` field).
+  enabled: true
+  ## @param scaledObject.minReplicaCount Minimum number of replicas.
+  minReplicaCount: 1
+  ## @param scaledObject.maxReplicaCount Maximum number of replicas.
+  maxReplicaCount: 10
+  triggers:
+    cpu:
+      ## @param scaledObject.triggers.cpu.value CPU utilization percentage threshold to trigger scale-out.
+      value: 80
+    memory:
+      ## @param scaledObject.triggers.memory.value Memory utilization percentage threshold to trigger scale-out.
+      value: 90
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown:
+          stabilizationWindowSeconds: 600
+          policies:
+          - type: Pods
+            value: 1
+            periodSeconds: 120
+        scaleUp:
+          stabilizationWindowSeconds: 0
