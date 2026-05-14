@@ -1,4 +1,5 @@
 ## @section Global parameters
+# Test patch release
 ## @param name [string] Application name, used as prefix for all Kubernetes resources. **Required.**
 name: "app-front-nginx"
 ## @param namespace [string] Kubernetes namespace to deploy into. **Required.**
