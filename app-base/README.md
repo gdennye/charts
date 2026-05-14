@@ -1,16 +1,16 @@
-<!--- app-name: app-base -->
+﻿<!--- app-name: app-base -->
 
 # app-base
 
 `app-base` is a generic Helm chart for deploying **backend applications** (REST APIs, gRPC services, workers, and microservices) on Kubernetes. It includes first-class support for KEDA-based autoscaling, GKE-native resources, and an optional Cloud SQL Auth Proxy sidecar.
 
-[Overview of app-base](https://github.com/your-org/charts)
+[Overview of app-base](https://github.com/gdennye/charts)
 
 ## TL;DR
 
 ```console
-helm repo add your-org https://your-org.github.io/charts
-helm install my-release your-org/app-base \
+helm repo add gdennye https://gdennye.github.io/charts
+helm install my-release gdennye/app-base \
   --set name=my-api \
   --set namespace=my-namespace \
   --set deployment.image.repository=my-registry/my-api \
@@ -46,8 +46,8 @@ It provisions the following Kubernetes resources:
 To install the chart with the release name `my-release`:
 
 ```console
-helm repo add your-org https://your-org.github.io/charts
-helm install my-release your-org/app-base
+helm repo add gdennye https://gdennye.github.io/charts
+helm install my-release gdennye/app-base
 ```
 
 > **Tip**: List all releases using `helm list`
@@ -353,13 +353,13 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 helm install my-release \
     --set deployment.image.repository=my-registry/my-api \
     --set deployment.image.tag=1.2.3 \
-    your-org/app-base
+    gdennye/app-base
 ```
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example:
 
 ```console
-helm install my-release -f my-values.yaml your-org/app-base
+helm install my-release -f my-values.yaml gdennye/app-base
 ```
 
 > **Tip**: You can use the default [values.yaml](./values.yaml) as a starting point.
@@ -372,7 +372,7 @@ Initial public release. No breaking changes from prior internal versions.
 
 ## License
 
-Copyright &copy; 2024 your-org
+Copyright &copy; 2024 gdennye
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

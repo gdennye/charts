@@ -1,10 +1,10 @@
-<!--- app-name: app-front-nginx -->
+﻿<!--- app-name: app-front-nginx -->
 
 # app-front-nginx
 
 `app-front-nginx` is a generic Helm chart for deploying **frontend Single Page Applications (SPA)** on Kubernetes where **NGINX is configured by the chart itself** via a dynamically generated ConfigMap. You do not need to bake an `nginx.conf` into your Docker image.
 
-[Overview of app-front-nginx](https://github.com/your-org/charts)
+[Overview of app-front-nginx](https://github.com/gdennye/charts)
 
 The chart operates in one of two modes, controlled by `ingress.external.enabled`:
 
@@ -18,8 +18,8 @@ The chart operates in one of two modes, controlled by `ingress.external.enabled`
 ## TL;DR
 
 ```console
-helm repo add your-org https://your-org.github.io/charts
-helm install my-release your-org/app-front-nginx \
+helm repo add gdennye https://gdennye.github.io/charts
+helm install my-release gdennye/app-front-nginx \
   --set name=my-spa \
   --set namespace=my-namespace \
   --set deployment.image.repository=nginx \
@@ -59,8 +59,8 @@ It provisions the following Kubernetes resources:
 To install the chart with the release name `my-release`:
 
 ```console
-helm repo add your-org https://your-org.github.io/charts
-helm install my-release your-org/app-front-nginx
+helm repo add gdennye https://gdennye.github.io/charts
+helm install my-release gdennye/app-front-nginx
 ```
 
 > **Tip**: List all releases using `helm list`
@@ -310,13 +310,13 @@ helm install my-release \
     --set deployment.image.repository=nginx \
     --set deployment.image.tag=1.27-alpine \
     --set ingress.external.host=app.example.com \
-    your-org/app-front-nginx
+    gdennye/app-front-nginx
 ```
 
 Alternatively, provide a YAML file:
 
 ```console
-helm install my-release -f my-values.yaml your-org/app-front-nginx
+helm install my-release -f my-values.yaml gdennye/app-front-nginx
 ```
 
 > **Tip**: You can use the default [values.yaml](./values.yaml) as a starting point.
@@ -329,7 +329,7 @@ Initial public release. Tolerations are now a configurable list (`deployment.tol
 
 ## License
 
-Copyright &copy; 2024 your-org
+Copyright &copy; 2024 gdennye
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

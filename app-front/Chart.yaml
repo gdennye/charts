@@ -1,4 +1,4 @@
-apiVersion: v2
+﻿apiVersion: v2
 name: app-front
 description: |
   A generic Helm chart for deploying frontend Single Page Applications (SPA) on Kubernetes.
@@ -8,9 +8,9 @@ description: |
 type: application
 version: 1.0.0
 appVersion: "1.0.0"
-home: https://github.com/your-org/charts
+home: https://github.com/gdennye/charts
 sources:
-  - https://github.com/your-org/charts
+  - https://github.com/gdennye/charts
 keywords:
   - frontend
   - spa
@@ -22,6 +22,6 @@ keywords:
   - autoscaling
   - gke
 maintainers:
-  - name: your-org
-    url: https://github.com/your-org
-icon: https://raw.githubusercontent.com/your-org/charts/main/assets/app-front.png
+  - name: gdennye
+    url: https://github.com/gdennye
+icon: https://raw.githubusercontent.com/gdennye/charts/main/assets/app-front.png

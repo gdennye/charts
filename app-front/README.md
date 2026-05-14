@@ -1,18 +1,18 @@
-<!--- app-name: app-front -->
+﻿<!--- app-name: app-front -->
 
 # app-front
 
 `app-front` is a generic Helm chart for deploying **frontend Single Page Applications (SPA)** on Kubernetes where the web server is **bundled inside the Docker image** (e.g., an image built with `nginx:alpine` as base). The chart does not manage the web server configuration — it simply deploys the image, exposes it, and wires up autoscaling and routing.
 
-[Overview of app-front](https://github.com/your-org/charts)
+[Overview of app-front](https://github.com/gdennye/charts)
 
 > **Looking for chart-managed NGINX config?** Use [`app-front-nginx`](../app-front-nginx/) instead.
 
 ## TL;DR
 
 ```console
-helm repo add your-org https://your-org.github.io/charts
-helm install my-release your-org/app-front \
+helm repo add gdennye https://gdennye.github.io/charts
+helm install my-release gdennye/app-front \
   --set name=my-spa \
   --set namespace=my-namespace \
   --set deployment.image.repository=my-registry/my-spa \
@@ -48,8 +48,8 @@ It provisions the following Kubernetes resources:
 To install the chart with the release name `my-release`:
 
 ```console
-helm repo add your-org https://your-org.github.io/charts
-helm install my-release your-org/app-front
+helm repo add gdennye https://gdennye.github.io/charts
+helm install my-release gdennye/app-front
 ```
 
 > **Tip**: List all releases using `helm list`
@@ -310,13 +310,13 @@ Specify each parameter using the `--set key=value[,key=value]` argument to `helm
 helm install my-release \
     --set deployment.image.repository=my-registry/my-spa \
     --set deployment.image.tag=2.1.0 \
-    your-org/app-front
+    gdennye/app-front
 ```
 
 Alternatively, provide a YAML file with the values:
 
 ```console
-helm install my-release -f my-values.yaml your-org/app-front
+helm install my-release -f my-values.yaml gdennye/app-front
 ```
 
 > **Tip**: You can use the default [values.yaml](./values.yaml) as a starting point.
@@ -329,7 +329,7 @@ Initial public release. Fixes a bug from prior internal versions where `readines
 
 ## License
 
-Copyright &copy; 2024 your-org
+Copyright &copy; 2024 gdennye
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD041 -->
 <p align="center">
-    <img width="320px" height="auto" src="https://raw.githubusercontent.com/gdennye/charts/main/assets/logo.png" />
+    <img width="200px" height="auto" src="https://raw.githubusercontent.com/helm/helm/main/docs/logos/helm-blue-vector.svg" alt="Helm Logo" />
 </p>
 
 <p align="center">
