@@ -1,12 +1,12 @@
 <!-- markdownlint-disable MD041 -->
 <p align="center">
-    <img width="320px" height="auto" src="https://raw.githubusercontent.com/your-org/charts/main/assets/logo.png" />
+    <img width="320px" height="auto" src="https://raw.githubusercontent.com/gdennye/charts/main/assets/logo.png" />
 </p>
 
 <p align="center">
-    <a href="https://github.com/your-org/charts"><img src="https://badgen.net/github/stars/your-org/charts?icon=github" /></a>
-    <a href="https://github.com/your-org/charts"><img src="https://badgen.net/github/forks/your-org/charts?icon=github" /></a>
-    <a href="https://github.com/your-org/charts/actions/workflows/release.yaml"><img src="https://github.com/your-org/charts/actions/workflows/release.yaml/badge.svg" /></a>
+    <a href="https://github.com/gdennye/charts"><img src="https://badgen.net/github/stars/gdennye/charts?icon=github" /></a>
+    <a href="https://github.com/gdennye/charts"><img src="https://badgen.net/github/forks/gdennye/charts?icon=github" /></a>
+    <a href="https://github.com/gdennye/charts/actions/workflows/release.yaml"><img src="https://github.com/gdennye/charts/actions/workflows/release.yaml/badge.svg" /></a>
 </p>
 
 Production-ready Helm charts for deploying applications on [Kubernetes](https://kubernetes.io), optimized for [Google Kubernetes Engine (GKE)](https://cloud.google.com/kubernetes-engine). Ready to launch using [Helm](https://github.com/helm/helm).
@@ -14,8 +14,8 @@ Production-ready Helm charts for deploying applications on [Kubernetes](https://
 ## TL;DR
 
 ```console
-helm repo add your-org https://your-org.github.io/charts
-helm install my-release your-org/<chart>
+helm repo add gdennye https://gdennye.github.io/charts
+helm install my-release gdennye/<chart>
 ```
 
 ## Available Charts
@@ -55,9 +55,9 @@ Please refer to the [Quick Start guide](https://helm.sh/docs/intro/quickstart/) 
 
 Useful Helm client commands:
 
-- Add this repo: `helm repo add your-org https://your-org.github.io/charts`
-- Install a chart: `helm install my-release your-org/<chart>`
-- Upgrade your application: `helm upgrade my-release your-org/<chart>`
+- Add this repo: `helm repo add gdennye https://gdennye.github.io/charts`
+- Install a chart: `helm install my-release gdennye/<chart>`
+- Upgrade your application: `helm upgrade my-release gdennye/<chart>`
 - List all releases: `helm list`
 
 ## Optional infrastructure dependencies
@@ -85,7 +85,7 @@ We welcome contributions! To contribute a fix or improvement:
 
 ## License
 
-Copyright &copy; 2024 your-org
+Copyright &copy; 2024 gdennye
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
