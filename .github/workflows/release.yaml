@@ -33,6 +33,48 @@ jobs:
         with:
           version: "v3.14.4"
 
+      - name: Install yq
+        run: |
+          sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
+          sudo chmod +x /usr/bin/yq
+
+      - name: Auto-bump versions
+        id: bump
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Commit message: $COMMIT_MSG"
+          
+          # Determine bump type
+          if [[ "$COMMIT_MSG" == *"!"* ]] || [[ "$COMMIT_MSG" == *"BREAKING CHANGE"* ]]; then
+            BUMP_TYPE="major"
+          elif [[ "$COMMIT_MSG" == "feat"* ]]; then
+            BUMP_TYPE="minor"
+          elif [[ "$COMMIT_MSG" == "fix"* ]] || [[ "$COMMIT_MSG" == "chore"* ]] || [[ "$COMMIT_MSG" == "refactor"* ]]; then
+            BUMP_TYPE="patch"
+          else
+            echo "No conventional commit prefix found (feat/fix/chore/refactor). Defaulting to patch."
+            BUMP_TYPE="patch"
+          fi
+          
+          # For each chart, check if it has changes
+          UPDATED_CHARTS=""
+          for chart in charts/*; do
+            if [ -d "$chart" ]; then
+              CHART_NAME=$(basename $chart)
+              # Check if files in this chart folder were modified in the last commit
+              if git diff --name-only HEAD^ HEAD | grep -q "^charts/$CHART_NAME/"; then
+                echo "Processing chart: $CHART_NAME"
+                OLD_VERSION=$(yq eval '.version' $chart/Chart.yaml)
+                NEW_VERSION=$(npx semver $OLD_VERSION -i $BUMP_TYPE)
+                
+                echo "Bumping $CHART_NAME: $OLD_VERSION -> $NEW_VERSION ($BUMP_TYPE)"
+                yq eval ".version = \"$NEW_VERSION\"" -i $chart/Chart.yaml
+                UPDATED_CHARTS="$UPDATED_CHARTS $CHART_NAME"
+              fi
+            fi
+          done
+          echo "updated_charts=$UPDATED_CHARTS" >> $GITHUB_OUTPUT
+
       - name: Lint Charts
         run: |
           helm lint ./charts/app-base
@@ -46,4 +88,11 @@ jobs:
           skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Commit version bumps
+        if: steps.bump.outputs.updated_charts != ''
+        run: |
+          git add charts/*/Chart.yaml
+          git commit -m "chore: auto-bump chart versions [skip ci]"
+          git push
 
