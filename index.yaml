@@ -3,6 +3,34 @@ entries:
   app-base:
   - apiVersion: v2
     appVersion: 1.0.0
+    created: "2026-05-14T17:04:32.783126673Z"
+    description: 'A generic Helm chart for deploying backend applications (APIs, workers,
+      microservices) on Kubernetes. Supports KEDA autoscaling, GKE Gateway API HTTPRoutes,
+      NGINX Ingress, GCP HealthCheckPolicy, PodDisruptionBudget, and optional Cloud
+      SQL Auth Proxy sidecar. '
+    digest: 0977f969b65bad2def99a10a813fe62dbbe76e128912b47e42baab68f7506b17
+    home: https://github.com/gdennye/charts
+    icon: https://raw.githubusercontent.com/gdennye/charts/main/assets/app-base.png
+    keywords:
+    - backend
+    - api
+    - microservice
+    - kubernetes
+    - keda
+    - autoscaling
+    - gke
+    maintainers:
+    - name: gdennye
+      url: https://github.com/gdennye
+    name: app-base
+    sources:
+    - https://github.com/gdennye/charts
+    type: application
+    urls:
+    - https://github.com/gdennye/charts/releases/download/app-base-1.1.0/app-base-1.1.0.tgz
+    version: 1.1.0
+  - apiVersion: v2
+    appVersion: 1.0.0
     created: "2026-05-14T16:55:47.082751448Z"
     description: 'A generic Helm chart for deploying backend applications (APIs, workers,
       microservices) on Kubernetes. Supports KEDA autoscaling, GKE Gateway API HTTPRoutes,
@@ -29,7 +57,72 @@ entries:
     urls:
     - https://github.com/gdennye/charts/releases/download/app-base-1.0.1/app-base-1.0.1.tgz
     version: 1.0.1
+  app-front:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-05-14T17:04:32.971759083Z"
+    description: 'A generic Helm chart for deploying frontend Single Page Applications
+      (SPA) on Kubernetes. The application image is expected to bundle its own web
+      server (e.g., NGINX or Node.js). Supports KEDA autoscaling, GKE Gateway API
+      HTTPRoutes, NGINX Ingress, GCP HealthCheckPolicy, and PodDisruptionBudget. '
+    digest: 38f9d5b4801f689cfe2f073b3e060a7a33b5dbcb62836d42d4380b76d67b8f51
+    home: https://github.com/gdennye/charts
+    icon: https://raw.githubusercontent.com/gdennye/charts/main/assets/app-front.png
+    keywords:
+    - frontend
+    - spa
+    - react
+    - vue
+    - angular
+    - kubernetes
+    - keda
+    - autoscaling
+    - gke
+    maintainers:
+    - name: gdennye
+      url: https://github.com/gdennye
+    name: app-front
+    sources:
+    - https://github.com/gdennye/charts
+    type: application
+    urls:
+    - https://github.com/gdennye/charts/releases/download/app-front-1.1.0/app-front-1.1.0.tgz
+    version: 1.1.0
   app-front-nginx:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2026-05-14T17:04:33.149372191Z"
+    description: 'A generic Helm chart for deploying frontend Single Page Applications
+      (SPA) where NGINX is managed by the chart itself via a ConfigMap. Supports HTTP-only
+      mode (external Ingress) and HTTPS/SSL termination at the pod level (internal
+      mode with TLS secrets). Supports KEDA autoscaling, GKE Gateway API HTTPRoutes,
+      NGINX Ingress, GCP HealthCheckPolicy, and PodDisruptionBudget. '
+    digest: cd57b9625d2d52e0e6e0e1d25c5d7083375c3a0ecddc71f6f9288b7db3fc503c
+    home: https://github.com/gdennye/charts
+    icon: https://raw.githubusercontent.com/gdennye/charts/main/assets/app-front-nginx.png
+    keywords:
+    - frontend
+    - spa
+    - nginx
+    - react
+    - vue
+    - angular
+    - kubernetes
+    - keda
+    - autoscaling
+    - gke
+    - ssl
+    - tls
+    maintainers:
+    - name: gdennye
+      url: https://github.com/gdennye
+    name: app-front-nginx
+    sources:
+    - https://github.com/gdennye/charts
+    type: application
+    urls:
+    - https://github.com/gdennye/charts/releases/download/app-front-nginx-1.1.0/app-front-nginx-1.1.0.tgz
+    version: 1.1.0
   - apiVersion: v2
     appVersion: 1.0.0
     created: "2026-05-14T16:48:39.104010229Z"
@@ -64,4 +157,4 @@ entries:
     urls:
     - https://github.com/gdennye/charts/releases/download/app-front-nginx-1.0.1/app-front-nginx-1.0.1.tgz
     version: 1.0.1
-generated: "2026-05-14T16:55:47.320820717Z"
+generated: "2026-05-14T17:04:33.149388893Z"
