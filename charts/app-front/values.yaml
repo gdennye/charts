@@ -1,9 +1,9 @@
 ## @section Global parameters
 ## @param name [string] Application name, used as prefix for all Kubernetes resources. **Required.**
+name: "app-front"
 ## @param namespace [string] Kubernetes namespace to deploy into. **Required.**
+namespace: "default"
 ## @param timezone [string] Timezone injected as TZ environment variable.
-name: ""
-namespace: ""
 timezone: "America/Sao_Paulo"
 
 ## @section Deployment parameters
@@ -24,21 +24,14 @@ deployment:
 
   image:
     ## @param deployment.image.repository Container image repository.
-    repository: ""
+    repository: "nginx"
     ## @param deployment.image.tag Container image tag.
-    tag: ""
+    tag: "latest"
     ## @param deployment.image.pullPolicy Image pull policy.
     pullPolicy: IfNotPresent
 
   ## @param deployment.resources Resource requests and limits for the main container.
   resources: {}
-  # resources:
-  #   limits:
-  #     cpu: 500m
-  #     memory: 512Mi
-  #   requests:
-  #     cpu: 100m
-  #     memory: 256Mi
 
   ports:
     http:
@@ -72,36 +65,24 @@ deployment:
 
   ## @param deployment.extraEnv Extra environment variables for the main container.
   extraEnv: []
-
   ## @param deployment.extraEnvFrom Additional envFrom sources (Secrets, ConfigMaps).
   extraEnvFrom: []
-
   ## @param deployment.extraVolumeMounts Extra volume mounts for the main container.
   extraVolumeMounts: []
-
   ## @param deployment.extraVolumes Extra volumes to add to the pod spec.
   extraVolumes: []
 
   nodeSelector:
-    ## @param deployment.nodeSelector.nodeTypePoolSpec Node pool label for scheduling. Leave empty to skip.
     nodeTypePoolSpec: ""
 
   ## @param deployment.tolerations Pod scheduling tolerations.
-  ## Example:
-  ## tolerations:
-  ##   - key: "nodepool"
-  ##     operator: "Equal"
-  ##     value: "standard"
-  ##     effect: "NoSchedule"
   tolerations: []
-
-  ## @param deployment.terminationGracePeriodSeconds Graceful termination period in seconds.
   terminationGracePeriodSeconds: 120
 
   ## NGINX volume mounts (paths for SSL secrets, used internally when TLS terminates at pod level)
   volumeMounts:
     nginx:
-      mountPath: {}
+      mountPath: "/etc/nginx/conf.d"
     ssl:
       mountPath: "/etc/nginx/ssl"
     ssl-default:
@@ -109,41 +90,28 @@ deployment:
 
 ## @section Service parameters
 service:
-  ## @param service.type Kubernetes service type.
   type: ClusterIP
-  ## @param service.annotations Annotations to add to the Service.
   annotations: {}
   ports:
-    ## @param service.ports.port Service port.
     port: 80
-    ## @param service.ports.targetPort Target port on the pod.
     targetPort: 80
 
 ## @section Ingress / Gateway parameters
 ingress:
   external:
-    ## @param ingress.external.enabled Enable external Ingress.
     enabled: false
-    ## @param ingress.external.host Primary external hostname.
-    host: ""
-    ## @param ingress.external.hosts Additional hostnames (overrides `host`).
+    host: "app.example.com"
     hosts: []
-    ## @param ingress.external.sectionNames Gateway API section names for the HTTPRoute.
     sectionNames: []
-    ## @param ingress.external.ingressClassName Ingress class name.
     ingressClassName: "nginx"
     tls:
       secretCertificate: ""
       configs: []
 
   internal:
-    ## @param ingress.internal.enabled Enable internal Gateway API HTTPRoute.
     enabled: false
-    ## @param ingress.internal.host Primary internal hostname.
-    host: ""
-    ## @param ingress.internal.hosts Additional hostnames (overrides `host`).
+    host: "app-internal.example.com"
     hosts: []
-    ## @param ingress.internal.sectionNames Gateway API section names. **Required when enabled.**
     sectionNames: []
     ingressClassName: "nginx"
     tls:
@@ -152,30 +120,21 @@ ingress:
 
 ## @section GCP parameters
 healthCheck:
-  ## @param healthCheck.requestPath HTTP path used by the GCP HealthCheckPolicy.
   requestPath: /healthcheck
 
 gcpBackendPolicy:
-  ## @param gcpBackendPolicy.timeoutSec Backend timeout in seconds.
   timeoutSec: 360
   logging:
     enabled: false
     sampleRate: 500000
 
-## @section PodDisruptionBudget
 pdb:
-  ## @param pdb.enabled Enable PodDisruptionBudget.
   enabled: false
-  ## @param pdb.minAvailable Minimum available pods (integer or percentage).
   minAvailable: ""
 
-## @section KEDA autoscaling
 scaledObject:
-  ## @param scaledObject.enabled Enable KEDA ScaledObject.
   enabled: true
-  ## @param scaledObject.minReplicaCount Minimum replicas.
   minReplicaCount: 1
-  ## @param scaledObject.maxReplicaCount Maximum replicas.
   maxReplicaCount: 10
   triggers:
     cpu:

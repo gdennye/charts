@@ -1,40 +1,41 @@
 ## @section Global parameters
 ## @param name [string] Application name, used as prefix for all Kubernetes resources. **Required.**
+name: "app-front-nginx"
 ## @param namespace [string] Kubernetes namespace to deploy into. **Required.**
+namespace: "default"
 ## @param timezone [string] Timezone injected as TZ environment variable.
-name: ""
-namespace: ""
 timezone: "America/Sao_Paulo"
 
 ## @section Deployment parameters
 deployment:
+  ## @param deployment.revisionHistoryLimit Number of old ReplicaSets to retain.
   revisionHistoryLimit: 1
+  ## @param deployment.progressDeadlineSeconds Seconds before a stalled deployment is considered failed.
   progressDeadlineSeconds: 3600
 
   strategy:
+    ## @param deployment.strategy.type Deployment strategy: `RollingUpdate` or `Recreate`.
     type: RollingUpdate
     rollingUpdate:
+      ## @param deployment.strategy.rollingUpdate.maxSurge Max extra pods during a rolling update.
       maxSurge: 1
+      ## @param deployment.strategy.rollingUpdate.maxUnavailable Max unavailable pods during a rolling update.
       maxUnavailable: 1
 
   image:
     ## @param deployment.image.repository Container image repository.
-    repository: ""
+    repository: "nginx"
     ## @param deployment.image.tag Container image tag.
-    tag: ""
+    tag: "latest"
+    ## @param deployment.image.pullPolicy Image pull policy.
     pullPolicy: IfNotPresent
 
+  ## @param deployment.resources Resource requests and limits for the main container.
   resources: {}
-  # resources:
-  #   limits:
-  #     cpu: 500m
-  #     memory: 512Mi
-  #   requests:
-  #     cpu: 100m
-  #     memory: 256Mi
 
   ports:
     http:
+      ## @param deployment.ports.http.containerPort HTTP port the container listens on.
       containerPort: 80
 
   probes:
@@ -59,67 +60,46 @@ deployment:
       periodSeconds: 15
       timeoutSeconds: 10
 
-  ## @section NGINX configuration
-  ## Controls how the nginx ConfigMap is generated.
   nginx:
-    ## @param deployment.nginx.workerProcesses NGINX worker_processes directive.
-    workerProcesses: "auto"
-    ## @param deployment.nginx.clientMaxBodySize Maximum allowed client request body size.
+    ## @param deployment.nginx.workerProcesses NGINX worker processes.
+    workerProcesses: auto
+    ## @param deployment.nginx.clientMaxBodySize NGINX client max body size.
     clientMaxBodySize: "100M"
-    ## @param deployment.nginx.gzip Enable gzip compression in NGINX.
+    ## @param deployment.nginx.gzip Enable gzip in NGINX.
     gzip: false
-    ## @param deployment.nginx.extraConfig Extra NGINX directives to append inside the server block.
+    ## @param deployment.nginx.extraConfig Extra NGINX configuration directives.
     extraConfig: ""
 
-  ## @param deployment.extraEnv Extra environment variables for the main container.
-  extraEnv: []
-
-  ## @param deployment.extraVolumeMounts Extra volume mounts for the main container.
   extraVolumeMounts: []
-
-  ## @param deployment.extraVolumes Extra volumes to add to the pod spec.
   extraVolumes: []
 
   nodeSelector:
-    ## @param deployment.nodeSelector.nodeTypePoolSpec Node pool label for scheduling. Leave empty to skip.
     nodeTypePoolSpec: ""
 
-  ## @param deployment.tolerations Pod scheduling tolerations.
   tolerations: []
-
   terminationGracePeriodSeconds: 120
 
-  ## Volume mount paths for NGINX SSL certificates.
   volumeMounts:
     nginx:
-      mountPath: {}
+      mountPath: "/etc/nginx/conf.d"
     ssl:
-      ## @param deployment.volumeMounts.ssl.mountPath Mount path for the primary SSL certificate secret.
       mountPath: "/etc/nginx/ssl"
     ssl-default:
-      ## @param deployment.volumeMounts.ssl-default.mountPath Mount path for the default SSL certificate secret.
       mountPath: "/etc/nginx/ssl-default"
 
 ## @section Service parameters
 service:
   type: ClusterIP
-  ## @param service.annotations Annotations to add to the Service.
   annotations: {}
   ports:
     port: 80
     targetPort: 80
 
 ## @section Ingress / Gateway parameters
-## When `ingress.external.enabled` is `true`, the NGINX ConfigMap uses HTTP-only mode (port 80,
-## CORS restricted to the external host). When `false`, NGINX runs in HTTPS mode (port 443, SSL
-## termination at the pod), with an HTTP→HTTPS redirect and two TLS certificate secrets:
-## `certificate-ssl` and `certificate-ssl-default`.
 ingress:
   external:
-    ## @param ingress.external.enabled When `true`, NGINX uses HTTP mode; when `false`, HTTPS/SSL mode.
     enabled: true
-    ## @param ingress.external.host Primary external hostname (used for CORS and NGINX `server_name`). **Required.**
-    host: ""
+    host: "app.example.com"
     hosts: []
     sectionNames: []
     ingressClassName: "nginx"
@@ -128,11 +108,9 @@ ingress:
       configs: []
 
   internal:
-    ## @param ingress.internal.enabled Enable internal Gateway API HTTPRoute.
     enabled: false
-    host: ""
+    host: "app-internal.example.com"
     hosts: []
-    ## @param ingress.internal.sectionNames Gateway API section names. **Required when enabled.**
     sectionNames: []
     ingressClassName: "nginx"
     tls:
@@ -149,12 +127,10 @@ gcpBackendPolicy:
     enabled: false
     sampleRate: 500000
 
-## @section PodDisruptionBudget
 pdb:
   enabled: false
   minAvailable: ""
 
-## @section KEDA autoscaling
 scaledObject:
   enabled: true
   minReplicaCount: 1
