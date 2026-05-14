@@ -152,3 +152,4 @@ scaledObject:
             periodSeconds: 120
         scaleUp:
           stabilizationWindowSeconds: 0
+# v1
